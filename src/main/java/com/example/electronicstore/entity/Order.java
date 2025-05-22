@@ -24,7 +24,7 @@ public class Order {
     private Payment payment;
 
     @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+    private OrderStatus status; // NEW, PENDING, PROCESSING, PAID, SHIPPED, DELIVERED, CANCELLED
 
     private LocalDateTime orderDate;
     private double totalAmount;

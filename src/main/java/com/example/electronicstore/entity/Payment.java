@@ -17,11 +17,11 @@ public class Payment {
     private Order order;
 
     @Enumerated(EnumType.STRING)
-    private PaymentMethod method;
+    private PaymentMethod method; // CREDIT_CARD, PAYPAL, BLIK, BANK_TRANSFER
 
     private double amount;
     private LocalDateTime paymentDate;
 
     @Enumerated(EnumType.STRING)
-    private PaymentStatus status;
+    private PaymentStatus status; // PENDING, COMPLETED, FAILED, REFUNDED
 }

@@ -1,25 +1,18 @@
 package com.example.electronicstore.service;
 
 import com.example.electronicstore.entity.Product;
-import com.example.electronicstore.repository.OrderItemRepository;
 import com.example.electronicstore.repository.ProductRepository;
-import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final OrderItemRepository orderItemRepository;
 
     @Transactional(readOnly = true)
     public List<Product> getAllProducts() {
@@ -29,41 +22,47 @@ public class ProductService {
     @Transactional(readOnly = true)
     public Product getProductById(Long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Product not found")); // Prosta obsługa błędów
     }
 
     @Transactional
-    public Product createProduct(ProductCreateDto dto) {
-        Product product = new Product();
-        product.setName(dto.name());
-        product.setPrice(dto.price());
-        product.setStock(dto.stock());
-        product.setCategory(dto.category());
+    public Product createProduct(Product product) {
         return productRepository.save(product);
     }
 
     @Transactional
-    public Product updateProduct(Long id, ProductUpdateDto dto) {
+    public Product updateProduct(Long id, Product productDetails) {
         Product product = getProductById(id);
-        if (dto.name() != null) product.setName(dto.name());
-        if (dto.price() > 0) product.setPrice(dto.price());
-        if (dto.stock() >= 0) product.setStock(dto.stock());
-        if (dto.category() != null) product.setCategory(dto.category());
+
+        if (productDetails.getName() != null) {
+            product.setName(productDetails.getName());
+        }
+        if (productDetails.getPrice() > 0) {
+            product.setPrice(productDetails.getPrice());
+        }
+        if (productDetails.getStock() >= 0) {
+            product.setStock(productDetails.getStock());
+        }
+        if (productDetails.getCategory() != null) {
+            product.setCategory(productDetails.getCategory());
+        }
+
         return productRepository.save(product);
     }
 
-    // Supporting DTOs as inner classes
-    public record ProductCreateDto(
-            @NotBlank String name,
-            @Positive Double price,
-            @PositiveOrZero Integer stock,
-            String category
-    ) {}
+    @Transactional
+    public void deleteProduct(Long id) {
+        productRepository.deleteById(id);
+    }
 
-    public record ProductUpdateDto(
-            String name,
-            @Positive Double price,
-            @PositiveOrZero Integer stock,
-            String category
-    ) {}
+    @Transactional
+    public void updateProductStock(Long productId, int quantityChange) {
+        Product product = getProductById(productId);
+        int newStock = product.getStock() + quantityChange;
+        if (newStock < 0) {
+            throw new RuntimeException("Insufficient stock");
+        }
+        product.setStock(newStock);
+        productRepository.save(product);
+    }
 }

@@ -25,15 +25,30 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody ProductService.ProductCreateDto dto) {
-        return ResponseEntity.ok(productService.createProduct(dto));
+    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
+        return ResponseEntity.ok(productService.createProduct(product));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(
             @PathVariable Long id,
-            @RequestBody ProductService.ProductUpdateDto dto
+            @RequestBody Product productUpdates
     ) {
-        return ResponseEntity.ok(productService.updateProduct(id, dto));
+        return ResponseEntity.ok(productService.updateProduct(id, productUpdates));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/stock")
+    public ResponseEntity<Product> updateStock(
+            @PathVariable Long id,
+            @RequestParam int quantityChange
+    ) {
+        productService.updateProductStock(id, quantityChange);
+        return ResponseEntity.ok(productService.getProductById(id));
     }
 }

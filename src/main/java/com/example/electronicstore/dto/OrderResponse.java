@@ -6,7 +6,7 @@ import java.util.List;
 public record OrderResponse(
         Long id,
         String status,
-        LocalDateTime orderDate,
+        LocalDateTime createdAt,
         double totalAmount,
         List<OrderItemResponse> items
 ) {}

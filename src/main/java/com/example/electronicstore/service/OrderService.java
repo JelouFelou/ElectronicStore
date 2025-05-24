@@ -1,12 +1,16 @@
 package com.example.electronicstore.service;
 
+import com.example.electronicstore.dto.OrderItemRequest;
+import com.example.electronicstore.dto.OrderItemResponse;
+import com.example.electronicstore.dto.OrderRequest;
+import com.example.electronicstore.dto.OrderResponse;
 import com.example.electronicstore.entity.*;
+import com.example.electronicstore.exception.InsufficientStockException;
+import com.example.electronicstore.exception.ResourceNotFoundException;
 import com.example.electronicstore.repository.OrderRepository;
 import com.example.electronicstore.repository.ProductRepository;
 import com.example.electronicstore.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +21,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class OrderService {
+
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
 
-    public Order createOrder(OrderCreateDto dto, String username) {
+    public OrderResponse createOrder(OrderRequest request, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Order order = new Order();
         order.setUser(user);
@@ -32,43 +37,57 @@ public class OrderService {
         List<OrderItem> items = new ArrayList<>();
         double total = 0;
 
-        for (OrderItemDto itemDto : dto.items()) {
-            Product product = productRepository.findById(itemDto.productId())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
+        for (OrderItemRequest itemRequest : request.items()) {
+            Product product = productRepository.findById(itemRequest.productId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
-            if (product.getStock() < itemDto.quantity()) {
-                throw new RuntimeException("Insufficient stock");
+            if (product.getStock() < itemRequest.quantity()) {
+                throw new InsufficientStockException("Insufficient stock for product: " + product.getName());
             }
 
             OrderItem item = new OrderItem();
             item.setProduct(product);
-            item.setQuantity(itemDto.quantity());
+            item.setQuantity(itemRequest.quantity());
             item.setUnitPrice(product.getPrice());
             item.setOrder(order);
 
             items.add(item);
-            total += product.getPrice() * itemDto.quantity();
-            product.setStock(product.getStock() - itemDto.quantity());
+            total += product.getPrice() * itemRequest.quantity();
+            product.setStock(product.getStock() - itemRequest.quantity());
         }
 
         order.setOrderItems(items);
         order.setTotalAmount(total);
         order.setStatus(OrderStatus.NEW);
-        return orderRepository.save(order);
+
+        Order savedOrder = orderRepository.save(order);
+        return convertToResponse(savedOrder);
     }
 
-    public Order getOrderById(Long id) {
+    public OrderResponse getOrderById(Long id) {
         return orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .map(this::convertToResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
     }
 
-    // Supporting DTOs
-    public record OrderCreateDto(
-            List<OrderItemDto> items
-    ) {}
+    private OrderResponse convertToResponse(Order order) {
+        return new OrderResponse(
+                order.getId(),
+                order.getStatus().name(),
+                order.getCreatedAt(),
+                order.getTotalAmount(),
+                order.getOrderItems().stream()
+                        .map(this::convertToItemResponse)
+                        .toList()
+        );
+    }
 
-    public record OrderItemDto(
-            @NotNull Long productId,
-            @Positive Integer quantity
-    ) {}
+    private OrderItemResponse convertToItemResponse(OrderItem item) {
+        return new OrderItemResponse(
+                item.getProduct().getId(),
+                item.getProduct().getName(),
+                item.getQuantity(),
+                item.getUnitPrice()
+        );
+    }
 }

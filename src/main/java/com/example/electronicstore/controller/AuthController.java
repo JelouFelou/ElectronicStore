@@ -1,14 +1,15 @@
 package com.example.electronicstore.controller;
 
+import com.example.electronicstore.dto.UserRequest;
 import com.example.electronicstore.dto.UserResponse;
-import com.example.electronicstore.entity.User;
 import com.example.electronicstore.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Authentication", description = "User registration and authentication endpoints")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -16,14 +17,12 @@ public class AuthController {
 
     private final UserService userService;
 
+    @Operation(summary = "Register new user", description = "Creates a new user account with USER role")
     @PostMapping("/register")
-    public UserResponse registerUser(@RequestBody UserService.UserRegisterDto dto) {
-        User user = userService.registerUser(dto);
-        return new UserResponse(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getRole().name()
-        );
+    public ResponseEntity<UserResponse> registerUser(
+            @RequestBody UserRequest request
+    ) {
+        UserResponse response = userService.registerUser(request);
+        return ResponseEntity.ok(response);
     }
 }

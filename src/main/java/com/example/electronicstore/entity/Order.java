@@ -2,12 +2,14 @@ package com.example.electronicstore.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Entity
 @Data
+@Entity
+@Table(name = "orders")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +27,10 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status; // NEW, PENDING, PROCESSING, PAID, SHIPPED, DELIVERED, CANCELLED
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
 
     private LocalDateTime orderDate;
     private double totalAmount;

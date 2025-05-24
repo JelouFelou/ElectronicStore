@@ -1,5 +1,6 @@
 package com.example.electronicstore.unittest;
 
+import com.example.electronicstore.dto.PaymentResponse;
 import com.example.electronicstore.entity.*;
 import com.example.electronicstore.repository.OrderRepository;
 import com.example.electronicstore.repository.PaymentRepository;
@@ -12,11 +13,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
@@ -35,22 +37,26 @@ class PaymentServiceTest {
     @DisplayName("Should process payment successfully")
     void processPayment_Success() {
         // Given
+        Long orderId = 1L;
         Order order = new Order();
-        order.setId(1L);
+        order.setId(orderId);
         order.setTotalAmount(100.0);
-        order.setStatus(OrderStatus.PENDING); // Dodane dla kompletności
+        order.setStatus(OrderStatus.PENDING);
 
         Payment payment = new Payment();
         payment.setStatus(PaymentStatus.COMPLETED);
+        payment.setPaymentDate(LocalDateTime.now());
 
+        // Symuluj zachowanie repozytoriów
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
         when(paymentRepository.save(any(Payment.class))).thenReturn(payment);
-        when(orderRepository.save(any(Order.class))).thenReturn(order);
 
         // When
-        Payment result = paymentService.processPayment(order, PaymentMethod.CREDIT_CARD);
+        PaymentResponse result = paymentService.processPayment(orderId, PaymentMethod.CREDIT_CARD);
 
         // Then
-        assertEquals(PaymentStatus.COMPLETED, result.getStatus());
+        assertEquals(PaymentStatus.COMPLETED, result.status());
+        verify(orderRepository, times(1)).findById(orderId);
         verify(orderRepository, times(1)).save(order);
         verify(paymentRepository, times(1)).save(any(Payment.class));
     }

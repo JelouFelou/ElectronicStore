@@ -1,4 +1,4 @@
-package com.example.electronicstore.unittest.service;
+package com.example.electronicstore.unittest;
 
 import com.example.electronicstore.entity.*;
 import com.example.electronicstore.repository.OrderRepository;
@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ActiveProfiles("test")
 class PaymentServiceTest {
 
     @Mock

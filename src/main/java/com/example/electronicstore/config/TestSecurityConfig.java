@@ -11,7 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-@Profile("test")
+@Profile("test") // Tylko dla środowiska testowego
 public class TestSecurityConfig {
 
     @Bean
@@ -24,6 +24,6 @@ public class TestSecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance(); // Uproszczony encoder dla testów
+        return NoOpPasswordEncoder.getInstance();
     }
 }

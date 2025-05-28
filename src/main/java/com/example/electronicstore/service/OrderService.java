@@ -15,7 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +28,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
 
-    public OrderResponse createOrder(OrderRequest request, String username) {
+    public Map<String, Object> createOrder(OrderRequest request, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -34,7 +36,7 @@ public class OrderService {
         order.setUser(user);
         order.setStatus(OrderStatus.PENDING);
 
-        List<OrderItem> items = new ArrayList<>();
+        List<Map<String, Object>> items = new ArrayList<>();
         double total = 0;
 
         for (OrderItemRequest itemRequest : request.items()) {
@@ -45,23 +47,28 @@ public class OrderService {
                 throw new InsufficientStockException("Insufficient stock for product: " + product.getName());
             }
 
-            OrderItem item = new OrderItem();
-            item.setProduct(product);
-            item.setQuantity(itemRequest.quantity());
-            item.setUnitPrice(product.getPrice());
-            item.setOrder(order);
+            Map<String, Object> item = new HashMap<>();
+            item.put("productId", product.getId());
+            item.put("productName", product.getName());
+            item.put("quantity", itemRequest.quantity());
+            item.put("unitPrice", product.getPrice());
 
             items.add(item);
             total += product.getPrice() * itemRequest.quantity();
             product.setStock(product.getStock() - itemRequest.quantity());
         }
 
-        order.setOrderItems(items);
         order.setTotalAmount(total);
         order.setStatus(OrderStatus.NEW);
-
         Order savedOrder = orderRepository.save(order);
-        return convertToResponse(savedOrder);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", savedOrder.getId());
+        response.put("status", savedOrder.getStatus().name());
+        response.put("totalAmount", savedOrder.getTotalAmount());
+        response.put("items", items);
+
+        return response;
     }
 
     public OrderResponse getOrderById(Long id) {

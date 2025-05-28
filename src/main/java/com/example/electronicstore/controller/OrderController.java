@@ -13,6 +13,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Tag(name = "Orders", description = "Order management endpoints")
 @RestController
 @RequestMapping("/api/orders")
@@ -23,12 +25,11 @@ public class OrderController {
     @Operation(summary = "Create new order", description = "Creates a new order for authenticated user")
     @PostMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<OrderResponse> createOrder(
-            @Parameter(description = "Order creation data", required = true)
+    public ResponseEntity<Map<String, Object>> createOrder(
             @Valid @RequestBody OrderRequest request,
             @AuthenticationPrincipal String username
     ) {
-        OrderResponse response = orderService.createOrder(request, username);
+        Map<String, Object> response = orderService.createOrder(request, username);
         return ResponseEntity.ok(response);
     }
 

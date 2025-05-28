@@ -1,4 +1,4 @@
-package com.example.electronicstore.unittest;
+package com.example.electronicstore.unittest.service;
 
 import com.example.electronicstore.dto.UserRequest;
 import com.example.electronicstore.dto.UserResponse;

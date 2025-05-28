@@ -1,8 +1,7 @@
-package com.example.electronicstore.unittest;
+package com.example.electronicstore.unittest.service;
 
 import com.example.electronicstore.dto.OrderItemRequest;
 import com.example.electronicstore.dto.OrderRequest;
-import com.example.electronicstore.dto.OrderResponse;
 import com.example.electronicstore.entity.Order;
 import com.example.electronicstore.entity.Product;
 import com.example.electronicstore.entity.User;
@@ -20,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -57,13 +57,20 @@ class OrderServiceTest {
 
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
+            Order order = invocation.getArgument(0);
+            order.setId(1L);
+            return order;
+        });
 
         // When
-        OrderResponse response = orderService.createOrder(request, "testUser");
+        Map<String, Object> response = orderService.createOrder(request, "testUser");
 
         // Then
-        assertEquals(200.0, response.totalAmount());
+        assertNotNull(response);
+        assertEquals(1L, response.get("id"));
+        assertEquals("NEW", response.get("status"));
+        assertEquals(200.0, (double) response.get("totalAmount"), 0.001);
         verify(orderRepository, times(1)).save(any(Order.class));
     }
 
@@ -76,7 +83,7 @@ class OrderServiceTest {
 
         Product product = new Product();
         product.setId(1L);
-        product.setStock(1); // Tylko 1 sztuka w magazynie
+        product.setStock(1);
 
         OrderRequest request = new OrderRequest(List.of(new OrderItemRequest(1L, 2))); // Żądanie 2 sztuk
 

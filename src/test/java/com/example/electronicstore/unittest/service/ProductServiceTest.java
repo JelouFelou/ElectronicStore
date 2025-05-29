@@ -87,4 +87,36 @@ class ProductServiceTest {
         // Then
         verify(productRepository, times(1)).deleteById(productId);
     }
+
+    @Test
+    @DisplayName("Should create product successfully")
+    void createProduct_Success() {
+        ProductRequest request = new ProductRequest("Laptop", 1999.99, 10, "Electronics");
+        Product product = new Product();
+        product.setId(1L);
+
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+
+        ProductResponse response = productService.createProduct(request);
+
+        assertNotNull(response);
+        assertEquals(1L, response.id());
+    }
+
+    @Test
+    @DisplayName("Should update product successfully")
+    void updateProduct_Success() {
+        Product existing = new Product();
+        existing.setId(1L);
+
+        ProductRequest request = new ProductRequest("Updated", 2999.99, 20, "Updated");
+
+        when(productRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(productRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        ProductResponse response = productService.updateProduct(1L, request);
+
+        assertEquals("Updated", response.name());
+        assertEquals(2999.99, response.price());
+    }
 }

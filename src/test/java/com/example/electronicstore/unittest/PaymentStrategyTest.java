@@ -98,4 +98,11 @@ class PaymentStrategyTest {
         PaymentStrategy strategy = new CreditCardPaymentStrategy();
         assertDoesNotThrow(() -> strategy.process(-100.0));
     }
+
+    @Test
+    @DisplayName("Processing large amount should not throw exception")
+    void processLargeAmount_ShouldNotThrowException() {
+        PaymentStrategy strategy = new CreditCardPaymentStrategy();
+        assertDoesNotThrow(() -> strategy.process(1000000.0));
+    }
 }

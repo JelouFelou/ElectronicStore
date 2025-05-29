@@ -1,5 +1,6 @@
 package com.example.electronicstore;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -10,6 +11,9 @@ import com.example.electronicstore.config.TestSecurityConfig;
 @ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
 class ElectronicStoreApplicationTests {
+
     @Test
-    void contextLoads() {}
+    @DisplayName("Context should load")
+    void contextLoads() {
+    }
 }

@@ -25,11 +25,10 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @WebMvcTest(ProductController.class)
 @Import({ProductService.class, TestSecurityConfig.class})
@@ -118,5 +117,34 @@ class ProductControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("DELETE /api/products/{id} - Should delete product (ADMIN only)")
+    @WithMockUser(roles = "ADMIN")
+    void deleteProduct_AdminAccess_DeletesProduct() throws Exception {
+        doNothing().when(productService).deleteProduct(1L);
+
+        mockMvc.perform(delete("/api/products/1"))
+                .andExpect(status().isNoContent());
+
+        verify(productService, times(1)).deleteProduct(1L);
+    }
+
+    @Test
+    @DisplayName("PUT /api/products/{id} - Should update product (ADMIN only)")
+    @WithMockUser(roles = "ADMIN")
+    void updateProduct_AdminAccess_UpdatesProduct() throws Exception {
+        ProductRequest request = new ProductRequest("Updated Laptop", 2999.99, 20, "Electronics");
+        ProductResponse response = new ProductResponse(1L, "Updated Laptop", 2999.99, 20, "Electronics");
+
+        when(productService.updateProduct(eq(1L), any(ProductRequest.class)))
+                .thenReturn(response);
+
+        mockMvc.perform(put("/api/products/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Updated Laptop"));
     }
 }

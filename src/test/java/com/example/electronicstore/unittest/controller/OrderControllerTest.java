@@ -17,9 +17,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -42,10 +45,8 @@ class OrderControllerTest {
     @DisplayName("POST /api/orders - Should create order (USER only, 200 OK)")
     @WithMockUser(roles = "USER")
     void createOrder_UserAccess_CreatesOrder() throws Exception {
-        // Given
         OrderRequest request = new OrderRequest(List.of(new OrderItemRequest(1L, 2)));
 
-        // Użyj OrderResponse zamiast Mapy
         OrderResponse response = new OrderResponse(
                 1L,
                 "NEW",
@@ -57,7 +58,6 @@ class OrderControllerTest {
         when(orderService.createOrder(any(OrderRequest.class), anyString()))
                 .thenReturn(response);
 
-        // When & Then
         mockMvc.perform(post("/api/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))

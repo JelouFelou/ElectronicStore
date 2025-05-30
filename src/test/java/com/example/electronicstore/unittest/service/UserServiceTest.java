@@ -5,7 +5,7 @@ import com.example.electronicstore.dto.UserResponse;
 import com.example.electronicstore.entity.User;
 import com.example.electronicstore.entity.UserRole;
 import com.example.electronicstore.exception.EmailAlreadyExistsException;
-import com.example.electronicstore.exception.ResourceNotFoundException;
+import com.example.electronicstore.exception.UserNotFoundException;
 import com.example.electronicstore.repository.UserRepository;
 import com.example.electronicstore.service.UserService;
 import org.junit.jupiter.api.DisplayName;
@@ -82,13 +82,13 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw ResourceNotFoundException when user is not found")
+    @DisplayName("Should throw UserNotFoundException when user is not found")
     void getUserById_UserNotFound_ThrowsException() {
         // Given
         Long userId = 999L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThrows(ResourceNotFoundException.class, () -> userService.getUserById(userId));
+        assertThrows(UserNotFoundException.class, () -> userService.getUserById(userId));
     }
 }

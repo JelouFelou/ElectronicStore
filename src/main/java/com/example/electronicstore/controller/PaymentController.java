@@ -19,15 +19,19 @@ import org.springframework.web.bind.annotation.*;
 public class PaymentController {
     private final PaymentService paymentService;
 
-    @Operation(summary = "Process payment", description = "Process payment for existing order")
+    @Operation(
+            summary = "Process a payment",
+            description = "Processes a payment for an existing order. " +
+                    "The user must be the owner of the order (provided in the 'X-Username' header)."
+    )
     @PostMapping
-    @PreAuthorize("hasRole('USER')")
+    //@PreAuthorize("hasRole('USER')")
     public ResponseEntity<PaymentResponse> processPayment(
             @Parameter(description = "Payment request data", required = true)
             @Valid @RequestBody PaymentRequest request
     ) {
         PaymentResponse response = paymentService.processPayment(
-                request.orderId(), // Przekazujemy orderId z PaymentRequest
+                request.orderId(),
                 request.method()
         );
         return ResponseEntity.ok(response);

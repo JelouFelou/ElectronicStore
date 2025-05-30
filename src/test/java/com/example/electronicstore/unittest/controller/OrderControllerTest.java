@@ -3,6 +3,7 @@ package com.example.electronicstore.unittest.controller;
 import com.example.electronicstore.config.TestSecurityConfig;
 import com.example.electronicstore.controller.OrderController;
 import com.example.electronicstore.dto.*;
+import com.example.electronicstore.exception.ResourceNotFoundException;
 import com.example.electronicstore.service.OrderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -79,6 +80,7 @@ class OrderControllerTest {
         mockMvc.perform(post("/api/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
     }
 }

@@ -105,4 +105,20 @@ class OrderServiceTest {
         // When & Then
         assertThrows(ResourceNotFoundException.class, () -> orderService.getOrderById(orderId));
     }
+
+    @Test
+    @DisplayName("Should throw exception when product not found")
+    void createOrder_ProductNotFound_ThrowsException() {
+        User user = new User();
+        user.setId(1L);
+
+        OrderRequest request = new OrderRequest(List.of(new OrderItemRequest(999L, 1)));
+
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+        when(productRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                orderService.createOrder(request, "testUser")
+        );
+    }
 }

@@ -30,7 +30,7 @@ public class OrderService {
 
     public Map<String, Object> createOrder(OrderRequest request, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
 
         Order order = new Order();
         order.setUser(user);

@@ -22,20 +22,28 @@ import java.util.Map;
 public class OrderController {
     private final OrderService orderService;
 
-    @Operation(summary = "Create new order", description = "Creates a new order for authenticated user")
+    @Operation(
+            summary = "Create a new order",
+            description = "Creates a new order for the specified user. " +
+                    "The user is identified by the 'X-Username' header. " +
+                    "The order must include at least one item."
+    )
     @PostMapping
-    @PreAuthorize("hasRole('USER')")
+    //@PreAuthorize("hasRole('USER')")
     public ResponseEntity<Map<String, Object>> createOrder(
             @Valid @RequestBody OrderRequest request,
-            @AuthenticationPrincipal String username
+            @RequestHeader("X-Username") String username
     ) {
         Map<String, Object> response = orderService.createOrder(request, username);
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get order details", description = "Retrieves order by ID")
+    @Operation(
+            summary = "Get order details",
+            description = "Retrieves the details of an order by its ID."
+    )
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    //@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.getOrderById(id));
     }

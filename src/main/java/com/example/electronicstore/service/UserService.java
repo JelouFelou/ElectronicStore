@@ -6,6 +6,7 @@ import com.example.electronicstore.entity.User;
 import com.example.electronicstore.entity.UserRole;
 import com.example.electronicstore.exception.EmailAlreadyExistsException;
 import com.example.electronicstore.exception.ResourceNotFoundException;
+import com.example.electronicstore.exception.UserNotFoundException;
 import com.example.electronicstore.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,7 +21,7 @@ public class UserService {
 
     public UserResponse registerUser(UserRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new EmailAlreadyExistsException("Email already registered");
+            throw new EmailAlreadyExistsException("Email " + request.email() + " is already registered");
         }
 
         User user = new User();
@@ -30,13 +31,14 @@ public class UserService {
         user.setRole(UserRole.USER);
 
         User savedUser = userRepository.save(user);
-        return convertToResponse(savedUser); // Zwracaj DTO zamiast encji
+        return convertToResponse(savedUser);
     }
 
     public UserResponse getUserById(Long id) {
-        return userRepository.findById(id)
-                .map(this::convertToResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        return convertToResponse(user);
     }
 
     private UserResponse convertToResponse(User user) {

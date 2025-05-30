@@ -4,6 +4,7 @@ import com.example.electronicstore.config.TestSecurityConfig;
 import com.example.electronicstore.controller.UserController;
 import com.example.electronicstore.dto.*;
 import com.example.electronicstore.exception.ResourceNotFoundException;
+import com.example.electronicstore.exception.UserNotFoundException;
 import com.example.electronicstore.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

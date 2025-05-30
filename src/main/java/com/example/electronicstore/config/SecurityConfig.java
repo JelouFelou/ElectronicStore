@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -20,16 +21,19 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/auth/**",
-                                // Dodaj te linie dla Swaggera ↓
-                                "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/swagger-resources/**",
+                                "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/webjars/**"
+                                "/api/auth/**",
+                                "/api/users/**",
+                                "/api/products/**",
+                                "/api/orders/**",
+                                "/api/payments/**",
+                                "/error"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic().disable()
                 .formLogin().disable();
 

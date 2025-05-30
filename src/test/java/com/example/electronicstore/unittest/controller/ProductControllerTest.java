@@ -14,9 +14,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -45,18 +42,18 @@ class ProductControllerTest {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Test
-    @DisplayName("GET /api/products - Should return paginated products (200 OK)")
+    @DisplayName("GET /api/products - Should return all products (200 OK)")
     @WithMockUser
-    void getAllProducts_ReturnsPaginatedList() throws Exception {
+    void getAllProducts_ReturnsList() throws Exception {
         // Given
         ProductResponse product = new ProductResponse(1L, "Laptop", 1999.99, 10, "Electronics");
-        Page<ProductResponse> page = new PageImpl<>(List.of(product));
-        when(productService.getAllProducts(any(Pageable.class))).thenReturn(page);
+        List<ProductResponse> products = List.of(product);
+        when(productService.getAllProducts()).thenReturn(products);
 
         // When & Then
         mockMvc.perform(get("/api/products"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].name", is("Laptop")));
+                .andExpect(jsonPath("$[0].name", is("Laptop")));
     }
 
     @Test
@@ -146,5 +143,18 @@ class ProductControllerTest {
                         .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Updated Laptop"));
+    }
+
+    @Test
+    @DisplayName("PATCH /api/products/{id}/stock - Should update stock (ADMIN only)")
+    @WithMockUser(roles = "ADMIN")
+    void updateStock_AdminAccess_UpdatesStock() throws Exception {
+        ProductResponse response = new ProductResponse(1L, "Laptop", 1999.99, 15, "Electronics");
+
+        when(productService.updateProductStock(1L, 5)).thenReturn(response);
+
+        mockMvc.perform(patch("/api/products/1/stock?quantityChange=5"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.stock").value(15));
     }
 }

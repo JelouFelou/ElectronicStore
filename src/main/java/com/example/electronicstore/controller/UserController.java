@@ -1,6 +1,7 @@
 package com.example.electronicstore.controller;
 
 import com.example.electronicstore.dto.UserResponse;
+import com.example.electronicstore.exception.UserNotFoundException;
 import com.example.electronicstore.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,10 +17,18 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @Operation(summary = "Get user details", description = "Retrieves user details by ID")
+    @Operation(
+            summary = "Get user details by ID",
+            description = "Retrieves the details of a user by their unique ID."
+    )
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    //@PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        try {
+            UserResponse response = userService.getUserById(id);
+            return ResponseEntity.ok(response);
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

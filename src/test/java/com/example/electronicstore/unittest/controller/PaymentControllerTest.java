@@ -5,6 +5,7 @@ import com.example.electronicstore.controller.PaymentController;
 import com.example.electronicstore.dto.*;
 import com.example.electronicstore.entity.PaymentMethod;
 import com.example.electronicstore.entity.PaymentStatus;
+import com.example.electronicstore.exception.PaymentProcessingException;
 import com.example.electronicstore.service.PaymentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -53,7 +54,8 @@ class PaymentControllerTest {
         // When & Then
         mockMvc.perform(post("/api/payments")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(request)))
+                        .content(mapper.writeValueAsString(request))
+                        .header("X-Username", "testuser"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("COMPLETED"));
     }
@@ -68,7 +70,25 @@ class PaymentControllerTest {
         // When & Then
         mockMvc.perform(post("/api/payments")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(invalidRequest)))
+                        .content(mapper.writeValueAsString(invalidRequest))
+                        .header("X-Username", "testuser"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    @DisplayName("POST /api/payments - Should return 400 for unsupported payment method")
+    @WithMockUser(roles = "USER")
+    void processPayment_UnsupportedMethod_Returns400() throws Exception {
+        PaymentRequest request = new PaymentRequest(1L, PaymentMethod.BLIK);
+
+        when(paymentService.processPayment(anyLong(), any()))
+                .thenThrow(new PaymentProcessingException("Unsupported method"));
+
+        mockMvc.perform(post("/api/payments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request))
+                        .header("X-Username", "testuser"))
                 .andExpect(status().isBadRequest());
     }
 }

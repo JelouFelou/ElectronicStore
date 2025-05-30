@@ -23,6 +23,8 @@ public class TestSecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        .requestMatchers("/api/orders/**").hasRole("USER")
+                        .requestMatchers("/api/payments/**").hasRole("USER")
                         .anyRequest().authenticated()
                 );
         return http.build();

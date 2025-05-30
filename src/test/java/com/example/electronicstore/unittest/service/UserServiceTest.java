@@ -91,4 +91,26 @@ class UserServiceTest {
         // When & Then
         assertThrows(UserNotFoundException.class, () -> userService.getUserById(userId));
     }
+
+    @Test
+    @DisplayName("Should get user by ID successfully")
+    void getUserById_Success() {
+        // Given
+        Long userId = 1L;
+        User user = new User();
+        user.setId(userId);
+        user.setUsername("testuser");
+        user.setEmail("test@example.com");
+        user.setRole(UserRole.USER); // DODAJ ROLĘ
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // When
+        UserResponse response = userService.getUserById(userId);
+
+        // Then
+        assertEquals(userId, response.id());
+        assertEquals("testuser", response.username());
+        assertEquals(UserRole.USER.name(), response.role()); // WERYFIKUJ ROLĘ
+    }
 }

@@ -4,7 +4,6 @@ import com.example.electronicstore.entity.User;
 import com.example.electronicstore.entity.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import javax.management.relation.Role;
 import java.util.List;
 import java.util.Optional;
 

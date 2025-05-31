@@ -1,7 +1,6 @@
 package com.example.electronicstore.unittest;
 
 import com.example.electronicstore.entity.PaymentMethod;
-import com.example.electronicstore.exception.PaymentProcessingException;
 import com.example.electronicstore.strategy.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -39,4 +39,12 @@ public class AuthController {
                     ));
         }
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(
+            @RequestParam String username,
+            @RequestParam String password
+    ) {
+        return ResponseEntity.ok().build();
+    }
 }

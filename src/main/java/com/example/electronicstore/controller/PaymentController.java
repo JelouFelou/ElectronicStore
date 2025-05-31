@@ -25,7 +25,7 @@ public class PaymentController {
                     "The user must be the owner of the order (provided in the 'X-Username' header)."
     )
     @PostMapping
-    //@PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<PaymentResponse> processPayment(
             @Parameter(description = "Payment request data", required = true)
             @Valid @RequestBody PaymentRequest request

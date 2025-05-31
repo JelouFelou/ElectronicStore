@@ -22,7 +22,7 @@ public class UserController {
             description = "Retrieves the details of a user by their unique ID."
     )
     @GetMapping("/{id}")
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         try {
             UserResponse response = userService.getUserById(id);

@@ -9,9 +9,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -60,7 +57,7 @@ public class ProductController {
     )
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ProductResponse createProduct(
             @Parameter(description = "Product creation data", required = true)
             @Valid @RequestBody ProductRequest request
@@ -75,7 +72,7 @@ public class ProductController {
                     "This operation is typically restricted to administrators."
     )
     @PutMapping("/{id}")
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ProductResponse updateProduct(
             @Parameter(description = "ID of the product to update", required = true)
             @PathVariable Long id,
@@ -93,7 +90,7 @@ public class ProductController {
                     "This operation is typically restricted to administrators."
     )
     @PatchMapping("/{id}/stock")
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ProductResponse updateStock(
             @Parameter(description = "ID of the product", required = true)
             @PathVariable Long id,
@@ -111,7 +108,7 @@ public class ProductController {
     )
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteProduct(
             @Parameter(description = "ID of the product to delete", required = true)
             @PathVariable Long id

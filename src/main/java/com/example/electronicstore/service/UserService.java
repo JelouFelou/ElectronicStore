@@ -5,7 +5,6 @@ import com.example.electronicstore.dto.UserResponse;
 import com.example.electronicstore.entity.User;
 import com.example.electronicstore.entity.UserRole;
 import com.example.electronicstore.exception.EmailAlreadyExistsException;
-import com.example.electronicstore.exception.ResourceNotFoundException;
 import com.example.electronicstore.exception.UserNotFoundException;
 import com.example.electronicstore.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

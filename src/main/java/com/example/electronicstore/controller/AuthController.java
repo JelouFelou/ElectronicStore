@@ -40,6 +40,9 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Login to your user account",
+            description = "Logins to your user account with your username and password."
+    )
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(
             @RequestParam String username,

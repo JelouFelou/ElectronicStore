@@ -10,7 +10,7 @@ Electronic Store to aplikacja backendowa dla sklepu elektronicznego zrealizowana
 * Przetwarzanie płatności
 
 ## Diagram ERD bazy danych
-![ERD diagram.](/images/erd_diagram.png")
+![ERD diagram.](/images/erd_diagram.png)
 
 ## Wymagania systemowe
 * Java 17
@@ -45,7 +45,7 @@ docker-compose up -d
 ```
 
 ## Swagger
-![Swagger.](/images/swagger.png")
+![Swagger.](/images/swagger.png)
 ### Główne endpointy
 * POST /api/auth/register - Rejestracja użytkownika
 * GET /api/products - Pobieranie listy produktów
@@ -56,7 +56,7 @@ docker-compose up -d
 ```
 mvn clean test jacoco:report
 ```
-![Jacoco report.](/images/jacoco.png")
+![Jacoco report.](/images/jacoco.png)
 
 ## Autor
 Adrian Bober
